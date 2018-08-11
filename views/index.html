@@ -90,6 +90,35 @@ a-scene {
 	display: flex;
 	flex-direction: column;
 }
+#message-bossDmg, #message-bossMove {
+	color: #FF0303;
+	/* color: yellow; */
+	position: absolute;
+	left: 2em;
+	bottom: 14%;
+	height: 1em;
+	width: 10em;
+	/* background-color: green; */
+}
+
+#message-bossMove {
+	bottom: 16%;
+}
+
+#message-bossDmg.slideUp, #message-bossMove.slideUp {
+	animation: 3s slideup ease-out;
+  animation-fill-mode: forwards;
+}
+@keyframes slideup {
+	0% {
+		transform: translateY(14%);
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(-50%);
+		opacity: 0;
+	}
+}
 #bossData {
 	position: absolute;
 	text-align: center;
@@ -231,7 +260,8 @@ a-scene {
           <span id="message-bossHp"></span>/<span id="message-bossMaxHp"></span>
         </span>
       </div>
-
+      <div id="message-bossMove"></div>
+      <div id="message-bossDmg"></div>
       <div id="playerData">
         <div class="playerHealth">
           <span id="multiPlayerId">Player&nbsp;<span id="multiId"></span>:&nbsp;</span>
@@ -275,18 +305,19 @@ a-scene {
     var ascene = document.querySelector('.a-canvas')
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
+    var bossTextAnimating = false;
     // waiting for marker to be found after page is loaded
-    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
-    var hideBattle = setInterval(() => {
-      if (document.getElementById('a-marker').object3D.visible) {
-        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
-        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
-        document.getElementById('enemyTitle').classList.remove('isHidden');
-        markerFound = true;
-        clearInterval(hideBattle);
-      }
-    }, 500);
+    // var hideBattle = setInterval(() => {
+    //   if (document.getElementById('a-marker').object3D.visible) {
+    //     // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+    //     // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
+    //     document.getElementById('enemyTitle').classList.remove('isHidden');
+    //     markerFound = true;
+    //     clearInterval(hideBattle);
+    //   }
+    // }, 500);
 
     // init game state
     let cactaur = {
@@ -327,6 +358,8 @@ a-scene {
       win: false,
       lose: false,
       gameover: false,
+      bossMsg: '',
+      bossDmg: '',
     }
 
     let startBattle = () => {
@@ -387,7 +420,8 @@ a-scene {
       let bossHp = document.getElementById('message-bossHp')
       let playerHp = document.getElementById('message-playerHp')
       let nextPlayer = document.getElementById('multiPlayerId');
-      let bossMsg = document.getElementById('message-boss');
+      let bossMsg = document.getElementById('message-bossMove');
+      let bossDmg = document.getElementById('message-bossDmg');
       // update player hp
       playerHp.innerText = gameState.playerMap[playerId].hp;
       // update boss hp
@@ -396,10 +430,22 @@ a-scene {
       currentMsg.innerText = gameState.currentMessage;
 
       bossMsg.innerText = gameState.bossMsg;
-      setTimeout(() => {
-        currentMsg.innerText = '';
-        bossMsg.innerText = '';
-      }, 3000)
+      bossMsg.innerText = gameState.bossDmg;
+      if (!bossTextAnimating) {
+        // bossMsg.classList.add('slideUp');
+        // bossDmg.classList.add('slideUp');
+        bossTextAnimating = true;
+        setTimeout(() => {
+          bossMsg.innerText = '';
+          bossDmg.innerText = '';
+          // if (bossTextAnimating) {
+          //   bossMsg.classList.remove('slideUp')
+          //   bossDmg.classList.remove('slideUp')
+            bossTextAnimating = false;
+          // }
+          currentMsg.innerText = '';
+        }, 3000)
+      }
 
       if (gameState.nextPlayer == playerId) {
         nextPlayer.classList.add('isNext');
@@ -449,6 +495,8 @@ a-scene {
           let dmg = gameState.boss[randomAction];
           let playerToDmg = gameState.playerMap[gameState.queue[randomTarget]];
           playerToDmg.hp -= dmg;
+          gameState.bossDmg = '-' + playerToDmg.number + ' HP!';
+          gameState.bossMsg = randomAction + '!';
           gameState.currentMessage = 'Cactaur used ' + randomAction + '! Player ' + playerToDmg.number + ' was damaged for ' + dmg + 'HP!'
           gameState.queueCounter += 1;
           console.log(playerToDmg, dmg, gameState.currentMessage)
@@ -480,6 +528,8 @@ a-scene {
       }
       let gameLoop = (gameState) => {
         gameState.bossHit = false;
+        gameState.bossDmg = '';
+        gameState.bossMsg = '';
         // check for gameovers
         if (gameState.lose || gameState.playerDeaths === gameState.queue.length - 1) {
           gameState.gameover = true;
@@ -526,6 +576,8 @@ a-scene {
       let updateDisplay = (gameState) => {
         let currentMsg = document.getElementById('message-current')
         let bossHp = document.getElementById('message-bossHp')
+        let bossMsg = document.getElementById('message-bossMove')
+        let bossDmg = document.getElementById('message-bossDmg')
         let playerHp = document.getElementById('message-playerHp')
         // update player hp
         playerHp.innerText = gameState.playerMap[playerId].hp;
@@ -539,7 +591,25 @@ a-scene {
             ascene.classList.remove('gotHit')
           }, 500)
         }
-        console.log('UPDATE', gameState.currentMessage)
+
+        if (!bossTextAnimating && gameState.bossMsg.length > 0) {
+          bossMsg.innerText = gameState.bossMsg;
+          bossDmg.innerText = gameState.bossDmg;
+          bossMsg.classList.add('slideUp');
+          bossDmg.classList.add('slideUp');
+          bossTextAnimating = true;
+          setTimeout(() => {
+            bossMsg.innerText = '';
+            bossDmg.innerText = '';
+            // if (bossTextAnimating) {
+              bossMsg.classList.remove('slideUp')
+              bossDmg.classList.remove('slideUp')
+              bossTextAnimating = false;
+            // }
+            currentMsg.innerText = '';
+          }, 3000)
+        }
+        console.log('UPDATEsolo', gameState.currentMessage)
       }
       updateDisplay(gameState);
       // gameloop

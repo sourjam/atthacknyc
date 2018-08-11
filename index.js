@@ -40,6 +40,7 @@ let gameStateTemplate = {
   started: false,
   nextPlayer: '',
   bossMsg: '',
+  bossDmg: '',
   bossHit: false,
 }
 let gameState = Object.assign({}, gameStateTemplate);
@@ -68,7 +69,8 @@ let bossTurn = (gameState) => {
     let dmg = gameState.boss[randomAction];
     let playerToDmg = gameState.playerMap[gameState.queue[randomTarget]];
     playerToDmg.hp -= dmg;
-    gameState.bossMsg = 'Cactaur used ' + randomAction + '! Player ' + playerToDmg.number + ' was damaged for ' + dmg + 'HP!'
+    gameState.bossDmg = '-' + playerToDmg.number + ' HP!';
+    gameState.bossMsg = randomAction + '!';
     gameState.queueCounter += 1;
     console.log(playerToDmg, dmg, gameState.currentMessage)
   }
@@ -98,6 +100,8 @@ let playerTurn = (gameState, playerKey) => {
 }
 let gameLoop = (gameState) => {
   gameState.bossHit = false;
+  gameState.bossDmg = '';
+  gameState.bossMsg = '';
   // check for gameovers
   if (gameState.lose || gameState.playerDeaths === gameState.queue.length - 1) {
     gameState.gameover = true;
