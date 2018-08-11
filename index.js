@@ -164,8 +164,15 @@ io.on('connection', (socket) => {
   socket.on('resetMulti', () => {
     gameState = Object.assign({}, gameStateTemplate);
     cactaur = Object.assign({}, cactaurTemplate);
-    console.log('cleared state', gameState)
-    io.emit('disconnectAll');
+    // console.log('cleared state', gameState)
+    console.log('HIIIIIII')
+    console.log(io)
+    let keys = Object.keys(io.sockets.sockets)
+    keys.forEach((key, i) => {
+      console.log('disconnect ', key)
+      io.sockets.sockets[key].disconnect();
+    });
+    // io.emit('disconnectAll');
   })
 
   socket.on('requestSlot', (json) => {
