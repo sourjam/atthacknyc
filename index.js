@@ -165,6 +165,7 @@ io.on('connection', (socket) => {
     gameState = Object.assign({}, gameStateTemplate);
     cactaur = Object.assign({}, cactaurTemplate);
     console.log('cleared state', gameState)
+    io.emit('disconnectAll');
   })
 
   socket.on('requestSlot', (json) => {

@@ -444,6 +444,10 @@ a-scene {
       startBattle();
     })
 
+    socket.on('disconnectAll', () => {
+      socket.disconnect();
+    })
+
     resetMulti.addEventListener('click', () => {
       socket.emit('resetMulti');
     })
