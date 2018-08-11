@@ -426,10 +426,8 @@ a-scene {
             let endMsg = document.getElementById('endMsg');
             if (gameState.win) {
               endMsg.innerText = 'You beat Cactaur!'
-              socket.disconnect();
             } else if (gameState.lose) {
               endMsg.innerText = 'Cactaur is victorious!'
-              socket.disconnect();
             }
             updateDisplay(gameState);
           }
@@ -454,6 +452,8 @@ a-scene {
     })
 
     resetMulti.addEventListener('click', () => {
+      gameState.playerMap = {};
+      gameState.queue = ['boss'];
       socket.emit('resetMulti');
     })
 
@@ -718,12 +718,15 @@ a-scene {
       // gameloop
       let game = setInterval(() => {
         let newState = gameLoop(gameState);
+        let endTitle = document.getElementById('endTitle')
+        endTitle.classList.remove('isHidden')
+        let endMsg = document.getElementById('endMsg')
         if (newState.gameover) {
           console.log('GAMEOVER', gameState)
           if (gameState.win) {
-            gameState.currentMessage = 'You beat Cactaur!'
+            endMsg.innerText = 'You beat Cactaur!'
           } else if (gameState.lose) {
-            gameState.currentMessage = 'Cactaur is victorious!'
+            endMsg.innerText = 'Cactaur is victorious!'
           }
           updateDisplay(gameState);
           clearInterval(game);

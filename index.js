@@ -162,8 +162,8 @@ io.on('connection', (socket) => {
   })
 
   socket.on('resetMulti', () => {
-    gameState = Object.assign({}, gameStateTemplate);
     cactaur = Object.assign({}, cactaurTemplate);
+    gameState = Object.assign({}, gameStateTemplate);
     // console.log('cleared state', gameState)
     console.log(io)
     let keys = Object.keys(io.sockets.sockets)
