@@ -10,13 +10,6 @@ html,body {
 	text-align: center;
 	overflow-x: hidden;
 }
-.portrait canvas {
-	transform-origin: 0 0;
-	transform: rotate(-90deg) translateX(-100%);
-}
-.desktop canvas {
- 	transform: scale(-1, 1);
-}
 .isHidden {
   opacity: 0;
 }
@@ -27,39 +20,155 @@ html,body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+	height: 100%;
+	width: 100%;
+	font-family: sans-serif;
+}
+#battleOverlay {
+	height: 100%;
+	width: 100%;
+}
+.enemyStats {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 10em;
+	font-weight: 100;
+	background-color: rgba(0, 0, 0, 0.7);
+}
+.enemyStats div {
+	padding: .1em;
+	padding-left: .3em;
+	padding-right: .3em;
+}
+.enemyName {
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
+}
+.divider {
+	margin-top: .2em;
+	margin-bottom: .2em;
+	border-bottom: 1px solid white;
+	width: 10em;
+}
+.loot {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+.loot div {
+	margin-left: .5em;
+	font-size: .9em;
+}
+.loot div:first-of-type {
+	padding-left: 0;
+	margin-left: 0;
+	font-size: 1em;
+}
+#soloFight, #multiFight {
+	cursor: pointer;
+	width: 10em;
+	height: 1.5em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 </style>
 </head>
-<body>
 
-  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-<script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
-<body style='margin : 0px; overflow: hidden;'>
-   <div id="enemyTitle" class="isHidden">
-     <div>Battle: Cactaur</div>
-     <button>SOLO FIGHT</button>
-     <button>MULTI FIGHT</button>
-   </div>
-	<a-scene embedded arjs='sourceType: webcam;'>
-    <a-marker id="a-marker" preset='hiro'>
-      <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
-  <!-- here define the content to display on top of the marker -->
-      <!-- <a-box position='0 0.5 0' material='color: red;'></a-box> -->
-    </a-marker>
-    <!-- define a simple camera -->
-    <a-entity camera></a-entity>
-		<!-- <a-plane src="https://res.cloudinary.com/dmsuvanyj/image/upload/v1478620978/143Snorlax_3D_Pro_cstfyh.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
-		<a-marker-camera preset='hiro'></a-marker-camera> -->
-	</a-scene>
-</body>
-<script>
-  var markerGot = false;
-  var hideBattle = setInterval(() => {
-    if (document.getElementById('a-marker').object3D.visible) {
-      document.getElementById('enemyTitle').classList.remove('isHidden');
-      console.log('tick')
-      clearInterval(hideBattle);
-    }
-  }, 500)
-</script>
+  <body style='margin : 0px; overflow: hidden;'>
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
+     <div id="enemyTitle" class="isHidden">
+       <div class="enemyStats">
+         <div class="enemyName"><span>Cactaur</span><span>Lvl. 20</span></div>
+         <div class="divider"></div>
+         <div>HP: 1000/1000</div>
+         <div>MP: 50/50</div>
+         <div>EXP: 20,000</div>
+         <div class="loot">
+           <div>Loot:</div>
+           <div>Rare: Katana</div>
+           <div>Common: Hi-Potion</div>
+         </div>
+         <div class="divider"></div>
+         <div id="soloFight">Solo Battle</div>
+         <div class="divider"></div>
+         <div id="multiFight">Multi Battle</div>
+       </div>
+    </div>
+    <div id="battleOverlay" class="isHidden">
+      <div id="message-attack"></div>
+    </div>
+    <div id="a-sceneContainer">
+    	<a-scene embedded arjs='sourceType: webcam;'>
+        <a-marker id="a-marker" preset='hiro'>
+          <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
+        </a-marker>
+        <!-- define a simple camera -->
+        <a-entity camera></a-entity>
+    	</a-scene>
+    </div>
+  </body>
+  <script>
+    var soloFight = document.getElementById('soloFight');
+    var multiFight = document.getElementById('multiFight');
+    var markerFound = false;
+    var playerId = Math.random().toFixed(3).toString().replace('0.', '');
+    // waiting for marker to be found after page is loaded
+    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    // uncomment below for release
+    var hideBattle = setInterval(() => {
+      if (document.getElementById('a-marker').object3D.visible) {
+        document.getElementById('enemyTitle').classList.remove('isHidden');
+        markerFound = true;
+        clearInterval(hideBattle);
+      }
+    }, 500);
+    soloFight.addEventListener('click', () => {
+      console.log('starting solo')
+      // no need for server at this point, we'll just run game loop on client
+      // in a full version we would need to go through server to prevent cheating
+      let cactaur = {
+        name: 'Cactaur',
+        attack: '100',
+        actions: ['100 needles', 'escape', '10 needles', 'thinking about an escape!'], // add an easy attack to help win?
+        dead: false,
+        hp: 600,
+        escapeCounter: 0,
+        '100 needles': 100,
+        '10 needles': 10
+      }
+      let player = {
+        hp: 300,
+        attack: 100,
+        critcal: 300,
+        actions: ['attack', 'critical', 'heal', 'miss']
+      }
+      let gameState = {
+        id: 'solo',
+        queue: [cactaur, player],
+        queueCounter: 0,
+        boss: cactaur,
+        currentMessage: undefined
+      }
+    })
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </html>

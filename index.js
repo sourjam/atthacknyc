@@ -8,19 +8,30 @@ app.use(express.static('public'))
 
 const PORT = process.env.PORT || 5000
 
-const boss = {
+const cactaur = {
   name: 'Cactaur',
   attack: '100',
   actions: ['attack', 'escape'],
   dead: false,
-  hp: '1000'
+  hp: 1000,
+  escapeCounter: 0,
 }
 
 let player = {
-
+  id: undefined
 }
 
-const activePlayers = []
+let gameState = {
+  id: undefined,
+  queue: [],
+  queueCounter: 0,
+  boss: cactaur,
+  currentMessage: undefined
+}
+
+let gameLoop = (gameState) => {
+
+}
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
@@ -40,6 +51,7 @@ io.on('connection', (socket) => {
 
   setInterval(() => {
     console.log('tick')
+    // call next turn
     io.emit('tick', 'tick');
   }, 1000)
 });
