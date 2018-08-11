@@ -12,6 +12,7 @@ html,body {
 }
 .isHidden {
   opacity: 0;
+  pointer-events: none;
 }
 a-scene {
 	position: absolute;
@@ -156,45 +157,56 @@ a-scene {
     //     clearInterval(hideBattle);
     //   }
     // }, 500);
+
+    // init game state
+    let cactaur = {
+      name: 'Cactaur',
+      attack: '100',
+      actions: ['100 needles', '10 needles', '1 needle', 'Cactaur is thinking about an escape!'], // add an easy attack to help win?
+      escapes: ['knows it\'s time escape!', 'is packing its needles!', 'is turning around!'],
+      dead: false,
+      hp: 1000,
+      maxHp: 1000,
+      escapeCounter: 0,
+      '100 needles': 100,
+      '10 needles': 10,
+      '1 needle': 1,
+    }
+    let player = {
+      number: 1,
+      hp: 300,
+      maxHp: 300,
+      attack: 100,
+      critical: 300,
+      heal: 100,
+      actions: ['attack', 'critical', 'miss']
+    }
+    let gameState = {
+      id: 'solo',
+      queue: ['boss', '001'],
+      queueCounter: 0,
+      playerActions: [],
+      actionCounter: 0,
+      boss: cactaur,
+      currentMessage: 'Battle Start!',
+      playerMap: {
+        '001': player
+      },
+      win: false,
+      lose: false,
+      gameover: false,
+    }
+
     soloFight.addEventListener('click', () => {
       playerId = '001';
       document.getElementById('enemyTitle').classList.add('isHidden');
       document.getElementById('battleOverlay').classList.remove('isHidden');
       console.log('starting solo')
+
       // no need for server at this point, we'll just run game loop on client
       // in a full version we would need to go through server to prevent cheating
-      let cactaur = {
-        name: 'Cactaur',
-        attack: '100',
-        actions: ['100 needles', '10 needles', 'Cactaur is thinking about an escape!'], // add an easy attack to help win?
-        escapes: ['knows it\'s time escape!', 'is packing its needles!', 'is turning around!'],
-        dead: false,
-        hp: 1000,
-        maxHp: 1000,
-        escapeCounter: 0,
-        '100 needles': 100,
-        '10 needles': 10
-      }
-      let player = {
-        number: 1,
-        hp: 300,
-        maxHp: 300,
-        attack: 100,
-        critcal: 300,
-        actions: ['attack', 'critical', 'heal', 'miss']
-      }
-      let gameState = {
-        id: 'solo',
-        queue: ['boss', '001'],
-        queueCounter: 0,
-        boss: cactaur,
-        currentMessage: 'Battle Start!',
-        playerMap: {
-          '001': player
-        },
-        win: false,
-        lose: false
-      }
+
+      // game loop logic
       let bossTurn = (gameState) => {
         if (gameState.boss.escapeCounter === 3) {
           gameState.currentMessage = 'Cactaur ran away!'
@@ -211,17 +223,48 @@ a-scene {
           return gameState;
         }
         // based on queue minus 0 index
-        let randomAction = Math.floor(Math.random() * (gameState.boss.actions.length - 1) + 1);
+        let randomAction = gameState.boss.actions[Math.floor(Math.random() * (gameState.boss.actions.length))];
         let randomTarget = Math.floor(Math.random() * (gameState.queue.length - 1) + 1);
-
+        console.log(randomAction, randomTarget)
+        if (gameState.boss[randomAction]) {
+          let dmg = gameState.boss[randomAction];
+          let playerToDmg = gameState.playerMap[gameState.queue[randomTarget]];
+          playerToDmg.hp -= dmg;
+          gameState.currentMessage = 'Player ' + playerToDmg.number + ' was damaged for ' + dmg + 'HP!'
+          gameState.queueCounter += 1;
+          console.log(playerToDmg, dmg, gameState.currentMessage)
+        }
+        return gameState
+      }
+      let playerTurn = (gameState, playerKey) => {
+        // process action array
+        let action = gameState.playerActions[gameState.actionCounter];
+        if (action.dmg) {
+          gameState.boss.hp -= action.dmg;
+          gameState.currentMessage = action.msg;
+        }
+        gameState.actionCounter += 1;
+        gameState.queueCounter += 1;
+        if (gameState.queueCounter >= gameState.queue.length) {
+          gameState.queueCounter = 0;
+          console.log('boss turn')
+        }
+        console.log('PLAYERRUN', gameState.currentMessage)
+        return gameState;
       }
       let gameLoop = (gameState) => {
         var nextTurnKey = gameState.queue[gameState.queueCounter]
         console.log(nextTurnKey)
+        let playerAction = gameState.playerActions[gameState.actionCounter];
         if (nextTurnKey === 'boss') {
           return bossTurn(gameState);
+        } else if (playerAction && playerAction.owner === nextTurnKey) {
+          console.log('action found')
+          return playerTurn(gameState, nextTurnKey);
+        } else {
+          gameState.currentMessage = 'Waiting for Player ' + gameState.playerMap[nextTurnKey].number;
+          return gameState;
         }
-        return gameState
       }
       document.getElementById('message-bossName').innerText = gameState.boss.name;
       document.getElementById('message-playerMaxHp').innerText = gameState.playerMap[playerId].maxHp;
@@ -236,19 +279,39 @@ a-scene {
         bossHp.innerText = gameState.boss.hp;
         // update current message
         currentMsg.innerText = gameState.currentMessage;
+        console.log('UPDATE', gameState.currentMessage)
       }
       updateDisplay(gameState);
       // gameloop
       let game = setInterval(() => {
         let newState = gameLoop(gameState);
+        console.log('NEWSTATE', newState.currentMessage)
         if (newState.gameover) {
           updateDisplay(gameState);
           clearInterval(game);
         }
-        if (newState.queueCounter !== queueCounter) {
-          updateDisplay(newState);
+        updateDisplay(newState);
+
+      }, 1000)
+    })
+    let attackButton = document.getElementById('attack');
+    attackButton.addEventListener('click', () => {
+      if (gameState.id === 'solo') {
+        console.log('offline attack')
+        let playerNumber = gameState.playerMap[playerId].number;
+        let action = { owner: playerId, dmg: 0, msg: 'Player ' + playerNumber + ' missed!' }
+        let isHit = Math.random();
+        let isCritical = Math.random();
+        if (isHit > .33) {
+          action.dmg = player.attack
+          action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP!'
+          if (isCritical > .8) {
+            action.dmg = player.critical
+            action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP! Critical!'
+          }
         }
-      }, 500)
+        gameState.playerActions.push(action);
+      }
     })
   </script>
 
