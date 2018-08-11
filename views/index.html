@@ -24,8 +24,15 @@ html,body {
 	height: 100%;
 	width: 100%;
 	font-family: sans-serif;
+	position: relative;
+	z-index: 1000;
 }
 #battleOverlay {
+	position: absolute;
+	z-index: 9;
+	top: 0;
+	left: 0;
+	color: white;
 	height: 100%;
 	width: 100%;
 	background-color: rgba(0, 0, 0, 0.3);
@@ -104,11 +111,19 @@ html,body {
     <div id="battleOverlay" class="isHidden">
       <div id="message-current"></div>
       <div id="message-bossName"></div>
-      <div id="message-bossHp"></div>
-      <div id="message-playerHp"></div>
+      <div>
+        HP
+        <span id="message-bossHp"></span>/<span id="message-bossMaxHp"></span>
+      </div>
+      <div>
+        HP
+        <span id="message-playerHp"></span>/<span id="message-playerMaxHp"></span>
+      </div>
       <button id="attack"></button>
     </div>
     <div id="a-sceneContainer">
+      <!-- Markercode from here -->
+      <!-- https://aframe.io/blog/arjs/#move-the-camera-or-the-marker -->
     	<a-scene embedded arjs='sourceType: webcam;'>
         <a-marker id="a-marker" preset='hiro'>
           <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
@@ -146,13 +161,16 @@ html,body {
         attack: '100',
         actions: ['100 needles', 'escape', '10 needles', 'thinking about an escape!'], // add an easy attack to help win?
         dead: false,
-        hp: 600,
+        hp: 1000,
+        maxHp: 1000,
         escapeCounter: 0,
         '100 needles': 100,
         '10 needles': 10
       }
       let player = {
+        number: 1,
         hp: 300,
+        maxHp: 300,
         attack: 100,
         critcal: 300,
         actions: ['attack', 'critical', 'heal', 'miss']
@@ -162,25 +180,34 @@ html,body {
         queue: [cactaur, '001'],
         queueCounter: 0,
         boss: cactaur,
-        currentMessage: 'Battle Start!'
+        currentMessage: 'Battle Start!',
+        playerMap: {
+          '001': player
+        }
       }
-      let playerMap = {
-        '001': player
-      }
-      let gameLoop = (gameState) => {
 
+      let gameLoop = (gameState) => {
+        return gameState
       }
       document.getElementById('message-bossName').innerText = gameState.boss.name;
+      document.getElementById('message-playerMaxHp').innerText = gameState.playerMap[playerId].maxHp;
+      document.getElementById('message-bossMaxHp').innerText = gameState.boss.maxHp;
       let updateDisplay = (gameState) => {
         let currentMsg = document.getElementById('message-current')
         let bossHp = document.getElementById('message-bossHp')
         let playerHp = document.getElementById('message-playerHp')
         // update player hp
+        playerHp.innerText = gameState.playerMap[playerId].hp;
 
       }
       updateDisplay(gameState);
-      setInterval(() => {
+      // gameloop
+      let game = setInterval(() => {
         let newState = gameLoop(gameState);
+        if (newState.gameover) {
+          updateDisplay(gameState);
+          clearInterval(game);
+        }
         if (newState.queueCounter !== queueCounter) {
           updateDisplay(newState);
         }
