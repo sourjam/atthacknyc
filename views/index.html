@@ -242,6 +242,12 @@ a-scene {
         if (action.dmg) {
           gameState.boss.hp -= action.dmg;
           gameState.currentMessage = action.msg;
+        } else if (action.heal) {
+          gameState.playerMap[playerKey].hp += action.heal;
+          if (gameState.playerMap[playerKey].hp > gameState.playerMap[playerKey].maxHp) {
+            gameState.playerMap[playerKey].hp = gameState.playerMap[playerKey].maxHp
+          }
+          gameState.currentMessage = action.msg;
         }
         gameState.actionCounter += 1;
         gameState.queueCounter += 1;
@@ -295,6 +301,7 @@ a-scene {
       }, 1000)
     })
     let attackButton = document.getElementById('attack');
+    let healButton = document.getElementById('heal');
     attackButton.addEventListener('click', () => {
       if (gameState.id === 'solo') {
         console.log('offline attack')
@@ -310,6 +317,14 @@ a-scene {
             action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP! Critical!'
           }
         }
+        gameState.playerActions.push(action);
+      }
+    })
+    healButton.addEventListener('click', () => {
+      if (gameState.id === 'solo') {
+        console.log('offline heal')
+        let playerNumber = gameState.playerMap[playerId].number;
+        let action = { owner: playerId, heal: player.heal, msg: 'Player ' + playerNumber + ' healed for ' + player.heal + 'HP!' }
         gameState.playerActions.push(action);
       }
     })
