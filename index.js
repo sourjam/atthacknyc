@@ -172,7 +172,9 @@ io.on('connection', (socket) => {
     let player = JSON.parse(json);
     gameState.queue.push(player.id);
     gameState.playerMap[player.id] = player;
-    console.log('json', gameState.queue)
+    console.log('json', gameState.queue);
+    let listJson = JSON.stringify(gameState);
+    io.emit('updatePlayerList', listJson);
   });
   socket.on('playerAction', (json) => {
     console.log('action', json)
