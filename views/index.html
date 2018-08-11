@@ -631,6 +631,10 @@ a-scene {
           gameState.gameover = true;
           gameState.win = true;
           return gameState;
+        } else if (gameState.playerMap['001'].hp <= 0) {
+          gameState.gameover = true;
+          gameState.lose = true;
+          return gameState;
         }
 
         var nextTurnKey = gameState.queue[gameState.queueCounter]
