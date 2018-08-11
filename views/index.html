@@ -60,6 +60,19 @@ a-scene {
 	display: flex;
 	flex-direction: column;
 }
+#bossData {
+	position: absolute;
+	text-align: center;
+	width: 54vw;
+	left: 23vw;
+	top: 20%;
+	background-color: rgba(0, 0 ,0 ,0.7);
+	border-radius: 5px;
+	color: white;
+	font-family: sans-serif;
+	font-weight: 100;
+	padding: .5em;
+}
 .playerHealth {
 	background-color: rgba(0, 0 ,0 ,0.7);
 	border-radius: 5px;
@@ -179,10 +192,12 @@ a-scene {
       <div id="message-current"></div>
       <div id="message-next"></div>
       <div id="message-boss"></div>
-      <div id="message-bossName"></div>
-      <div>
-        HP
-        <span id="message-bossHp"></span>/<span id="message-bossMaxHp"></span>
+      <div id="bossData">
+        <span id="message-bossName"></span>
+        <span>
+          HP
+          <span id="message-bossHp"></span>/<span id="message-bossMaxHp"></span>
+        </span>
       </div>
 
       <div id="playerData">
