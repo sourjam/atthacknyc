@@ -77,7 +77,7 @@ a-scene {
 	padding: .25em;
 	background-color: white;
 }
-#enemyTitle, #multiTitle {
+#enemyTitle, #multiTitle, #endTitle {
   font-size: 1em;
 	line-height: 1.5em;
   color: white;
@@ -91,10 +91,11 @@ a-scene {
 	position: relative;
 	z-index: 1000;
 }
-#multiTitle {
+#multiTitle, #endTitle {
   position: absolute;
   top: 0;
 	left: 0;
+	border-radius: 5px;
 }
 #battleOverlay {
 	position: absolute;
@@ -275,6 +276,13 @@ a-scene {
         <div id="startMulti">Start Multi Battle</div>
       </div>
     </div>
+    <div id="endTitle" class="isHidden">
+      <div class="enemyStats">
+        <div class="enemyName"><span id="endMsg"></span></div>
+        <span class="divider"></span>
+        <div>Please refresh your browser to play again</div>
+      </div>
+    </div>
     <div id="battleOverlay" class="isHidden">
       <img id="ffLogo" src="./logo.png"/>
       <div id="playerTurns" class="playerTurns isHidden">
@@ -342,17 +350,17 @@ a-scene {
     var bossTextAnimating = false;
     var playerTextAnimating = false;
     // waiting for marker to be found after page is loaded
-    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
-    // var hideBattle = setInterval(() => {
-    //   if (document.getElementById('a-marker').object3D.visible) {
-    //     // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
-    //     // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
-    //     document.getElementById('enemyTitle').classList.remove('isHidden');
-    //     markerFound = true;
-    //     clearInterval(hideBattle);
-    //   }
-    // }, 500);
+    var hideBattle = setInterval(() => {
+      if (document.getElementById('a-marker').object3D.visible) {
+        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
+        document.getElementById('enemyTitle').classList.remove('isHidden');
+        markerFound = true;
+        clearInterval(hideBattle);
+      }
+    }, 500);
 
     // init game state
     let cactaur = {
@@ -413,11 +421,14 @@ a-scene {
           document.getElementById('message-bossMaxHp').innerText = gameState.boss.maxHp;
           if (newState.gameover) {
             console.log('GAMEOVER', gameState)
+            let endTitle = document.getElementById('endTitle');
+            endTitle.classList.remove('isHidden');
+            let endMsg = document.getElementById('endMsg');
             if (gameState.win) {
-              gameState.currentMessage = 'You beat Cactaur!'
+              endMsg.innerText = 'You beat Cactaur!'
               socket.disconnect();
             } else if (gameState.lose) {
-              gameState.currentMessage = 'Cactaur is victorious!'
+              endMsg.innerText = 'Cactaur is victorious!'
               socket.disconnect();
             }
             updateDisplay(gameState);
