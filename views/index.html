@@ -19,7 +19,7 @@ a-scene {
 	top: 0;
 	left: 0;
 }
-#a-scene.gotHit {
+.a-canvas.gotHit {
 	animation: .66s bosshit ease-in-out;
 }
 @keyframes bosshit {
@@ -44,6 +44,7 @@ a-scene {
 	}
 	100% {
 		transform: rotate3d(0, 1, 0, 360deg);
+		transform-origin: center;
 	}
 }
 #ffLogo {
@@ -266,7 +267,7 @@ a-scene {
     var multiFight = document.getElementById('multiFight');
     var startMulti = document.getElementById('startMulti');
     var multiTitle = document.getElementById('multiTitle');
-    var ascene = document.getElementById('a-scene')
+    var ascene = document.querySelector('.a-canvas')
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
     // waiting for marker to be found after page is loaded
