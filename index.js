@@ -154,6 +154,12 @@ io.on('connection', (socket) => {
     io.emit('startBattle', json);
   })
 
+  socket.on('resetMulti', () => {
+    gameState = Object.assign({}, gameStateTemplate);
+    cactaur = Object.assign({}, cactaurTemplate);
+    console.log('cleared state', gameState)
+  })
+
   socket.on('requestSlot', (json) => {
     let player = JSON.parse(json);
     gameState.queue.push(player.id);

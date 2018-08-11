@@ -40,11 +40,12 @@ a-scene {
 	}
 	50% {
 		/* transform: rotate3d(0, 1, 0, 0deg); */
-		transform-origin: center;
+		/* transform: rotateZ(0deg); */
+		/* transform-origin: center; */
 	}
 	100% {
-		/* transform: rotate3d(0, 1, 0, 360deg); */
-		transform-origin: center;
+		/* transform: rotateZ(360deg); */
+		/* transform-origin: center; */
 	}
 }
 #ffLogo {
@@ -166,7 +167,7 @@ a-scene {
 	margin-left: 0;
 	font-size: 1em;
 }
-#soloFight, #multiFight {
+#soloFight, #multiFight, #restartMulti {
 	cursor: pointer;
 	width: 13em;
 	height: 1.5em;
@@ -198,6 +199,8 @@ a-scene {
          <div id="soloFight">Solo Battle</div>
          <span class="divider"></span>
          <div id="multiFight">Multi Battle</div>
+         <span class="divider"></span>
+         <div id="restartMulti">Restart Multi</div>
        </div>
     </div>
     <div id="multiTitle" class="isHidden">
@@ -243,6 +246,7 @@ a-scene {
         </div>
         <!-- <button id="attack">Attack</button> -->
         <!-- <button id="heal">Heal</button> -->
+        <!-- <button id="resetMulti">Reset Multi</button> -->
       </div>
     </div>
       <!-- https://github.com/jeromeetienne/AR.js/blob/master/README.md -->
@@ -266,6 +270,7 @@ a-scene {
     var soloFight = document.getElementById('soloFight');
     var multiFight = document.getElementById('multiFight');
     var startMulti = document.getElementById('startMulti');
+    var resetMulti = document.getElementById('restartMulti');
     var multiTitle = document.getElementById('multiTitle');
     var ascene = document.querySelector('.a-canvas')
     var markerFound = false;
@@ -361,6 +366,10 @@ a-scene {
       let newState = JSON.parse(json);
       gameState = newState;
       startBattle();
+    })
+
+    resetMulti.addEventListener('click', () => {
+      socket.emit('resetMulti');
     })
 
     multiFight.addEventListener('click', () => {
