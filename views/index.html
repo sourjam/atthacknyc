@@ -19,6 +19,20 @@ a-scene {
 	top: 0;
 	left: 0;
 }
+#a-scene.gotHit {
+	animation: .5s bosshit ease-in-out;
+}
+@keyframes bosshit {
+	0% {
+		transform: translateY(-15%)
+	}
+	50% {
+		transform: translateY(15%)
+	}
+	100% {
+		transform: translateY(0)
+	}
+}
 #ffLogo {
 	position: absolute;
 	top: 1em;
@@ -238,6 +252,7 @@ a-scene {
     var multiFight = document.getElementById('multiFight');
     var startMulti = document.getElementById('startMulti');
     var multiTitle = document.getElementById('multiTitle');
+    var ascene = document.getElementById('a-scene')
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
     // waiting for marker to be found after page is loaded
@@ -346,6 +361,12 @@ a-scene {
       bossHp.innerText = gameState.boss.hp;
       // update current message
       currentMsg.innerText = gameState.currentMessage;
+      if (gameState.innerText.match('hit')) {
+        ascene.classList.add('gotHit');
+        setTimeout(() => {
+          ascene.classList.remove('gotHit')
+        }, 500)
+      }
       bossMsg.innerText = gameState.bossMsg;
       setTimeout(() => {
         currentMsg.innerText = '';
