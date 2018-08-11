@@ -17,6 +17,17 @@ html,body {
 .desktop canvas {
  	transform: scale(-1, 1);
 }
+.isHidden {
+  opacity: 0;
+}
+#enemyTitle {
+  font-size: 2em;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 </style>
 </head>
 <body>
@@ -24,14 +35,14 @@ html,body {
   <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
 <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
 <body style='margin : 0px; overflow: hidden;'>
-   <div id="enemy">Battle: Snorlax</div>
-   <div id="buttons">
-      <button id="action1">Attack</button>
-      <button id="action2">Defend</button>
+   <div id="enemyTitle" class="isHidden">
+     <div>Battle: Cactaur</div>
+     <button>SOLO FIGHT</button>
+     <button>MULTI FIGHT</button>
    </div>
 	<a-scene embedded arjs='sourceType: webcam;'>
-    <a-marker preset='hiro'>
-      <a-plane src="https://res.cloudinary.com/dmsuvanyj/image/upload/v1478620978/143Snorlax_3D_Pro_cstfyh.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
+    <a-marker id="a-marker" preset='hiro'>
+      <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
   <!-- here define the content to display on top of the marker -->
       <!-- <a-box position='0 0.5 0' material='color: red;'></a-box> -->
     </a-marker>
@@ -41,102 +52,14 @@ html,body {
 		<a-marker-camera preset='hiro'></a-marker-camera> -->
 	</a-scene>
 </body>
-
-<!-- <script async src="../build/artoolkit.min.js"></script>
-<script async src="js/third_party/three.js/three.min.js"></script>
-<script async src="../js/artoolkit.three.js"></script> -->
-<!--
-<script async src="artoolkit.min.js"></script>
-<script async src="three.min.js"></script>
-<script async src="artoolkit.three.js"></script>
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.3.2/adapter.min.js"></script>
-
-
 <script>
-
-window.ARThreeOnLoad = function() {
-
-	ARController.getUserMediaThreeScene({maxARVideoSize: 320, facing: 'environment', cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat',
-	onSuccess: function(arScene, arController, arCamera) {
-
-		document.body.className = arController.orientation;
-
-		var renderer = new THREE.WebGLRenderer({antialias: true});
-		if (arController.orientation === 'portrait') {
-			var w = (window.innerWidth / arController.videoHeight) * arController.videoWidth;
-			var h = window.innerWidth;
-			renderer.setSize(w, h);
-			renderer.domElement.style.paddingBottom = (w-h) + 'px';
-		} else {
-			if (/Android|mobile|iPad|iPhone/i.test(navigator.userAgent)) {
-				renderer.setSize(window.innerWidth, (window.innerWidth / arController.videoWidth) * arController.videoHeight);
-			} else {
-				renderer.setSize(arController.videoWidth, arController.videoHeight);
-				document.body.className += ' desktop';
-			}
-		}
-
-		document.body.insertBefore(renderer.domElement, document.body.firstChild);
-
-		var rotationV = 0;
-		var rotationTarget = 0;
-
-		renderer.domElement.addEventListener('click', function(ev) {
-			ev.preventDefault();
-			rotationTarget += 1;
-		}, false);
-
-		var sphere = new THREE.Mesh(
-			new THREE.SphereGeometry(0.5, 8, 8),
-			new THREE.MeshNormalMaterial()
-		);
-		sphere.material.shading = THREE.FlatShading;
-		sphere.position.z = 0.5;
-
-		var torus = new THREE.Mesh(
-			new THREE.TorusGeometry(0.3, 0.2, 8, 8),
-			new THREE.MeshNormalMaterial()
-		);
-		torus.material.shading = THREE.FlatShading;
-		torus.position.z = 0.5;
-		torus.rotation.x = Math.PI/2;
-
-		arController.loadMarker('Data/patt.hiro', function(markerId) {
-			var markerRoot = arController.createThreeMarker(markerId);
-			markerRoot.add(sphere);
-			arScene.scene.add(markerRoot);
-		});
-
-		arController.loadMarker('Data/patt.kanji', function(markerId) {
-			var markerRoot = arController.createThreeMarker(markerId);
-			markerRoot.add(torus);
-			arScene.scene.add(markerRoot);
-		});
-
-		var tick = function() {
-			arScene.process();
-
-			rotationV += (rotationTarget - sphere.rotation.z) * 0.05;
-			sphere.rotation.z += rotationV;
-			torus.rotation.y += rotationV;
-			rotationV *= 0.8;
-
-			arScene.renderOn(renderer);
-			requestAnimationFrame(tick);
-		};
-
-		tick();
-
-	}});
-
-	delete window.ARThreeOnLoad;
-
-};
-
-if (window.ARController && ARController.getUserMediaThreeScene) {
-	ARThreeOnLoad();
-}
-</script> -->
-
-</body>
+  var markerGot = false;
+  var hideBattle = setInterval(() => {
+    if (document.getElementById('a-marker').object3D.visible) {
+      document.getElementById('enemyTitle').classList.remove('isHidden');
+      console.log('tick')
+      clearInterval(hideBattle);
+    }
+  }, 500)
+</script>
 </html>
