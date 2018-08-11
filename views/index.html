@@ -19,7 +19,13 @@ a-scene {
 	top: 0;
 	left: 0;
 }
-#enemyTitle {
+#ffLogo {
+	position: absolute;
+	top: 1em;
+	left: 1em;
+	width: 8em;
+}
+#enemyTitle, #multiTitle {
   font-size: 1em;
 	line-height: 1.5em;
   color: white;
@@ -32,6 +38,10 @@ a-scene {
 	font-family: sans-serif;
 	position: relative;
 	z-index: 1000;
+}
+#multiTitle {
+  position: absolute;
+  top: 0;
 }
 #battleOverlay {
 	position: absolute;
@@ -48,14 +58,33 @@ a-scene {
 	bottom: 1em;
 	left: 0;
 	display: flex;
+	flex-direction: column;
+}
+.playerHealth {
+	background-color: rgba(0, 0 ,0 ,0.7);
+	border-radius: 5px;
+	color: white;
+	font-family: sans-serif;
+	font-weight: 100;
+	padding: .5em;
+	margin-left: .5em;
+	margin-bottom: .5em;
 }
 #attack, #heal {
-	width: 6em;
-	border: 1px solid black;
-	margin-left: 2em;
-	border-radius: 5px;
-	height: 2em;
-	background-color: white;
+	width: 4em;
+	margin-left: 1em;
+	height: 4em;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#multiPlayerId {
+  max-height: 1em;
+  font-size: 1em;
+}
+#multiPlayerId.isNext {
+  box-shadow: 0px 0px 20px 5px palegreen;
+  background-color: palegreen;
+  border-radius: 5px;
 }
 .enemyStats {
 	display: flex;
@@ -107,8 +136,9 @@ a-scene {
 </head>
 
   <body style='margin : 0px; overflow: hidden;'>
-    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
+    <!-- DEBUG -->
+    <!-- <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script> -->
     <!-- pre fight title screen -->
      <div id="enemyTitle" class="isHidden">
        <div class="enemyStats">
@@ -128,8 +158,27 @@ a-scene {
          <div id="multiFight">Multi Battle</div>
        </div>
     </div>
+    <div id="multiTitle" class="isHidden">
+      <div class="enemyStats">
+        <div class="enemyName"><span>Waiting for Players</span></div>
+        <span class="divider"></span>
+        <div>HP: 1000/1000</div>
+        <div>MP: 50/50</div>
+        <div>EXP: 20,000</div>
+        <div class="loot">
+          <div>Loot:</div>
+          <div>Rare: Katana</div>
+          <div>Common: Hi-Potion</div>
+        </div>
+        <span class="divider"></span>
+        <div id="startMulti">Start Multi Battle</div>
+      </div>
+    </div>
     <div id="battleOverlay" class="isHidden">
+      <img id="ffLogo" src="./logo.png"/>
       <div id="message-current"></div>
+      <div id="message-next"></div>
+      <div id="message-boss"></div>
       <div id="message-bossName"></div>
       <div>
         HP
@@ -137,13 +186,19 @@ a-scene {
       </div>
 
       <div id="playerData">
-        Player:&nbsp;
-        <div>
-          HP
-          <span id="message-playerHp"></span>/<span id="message-playerMaxHp"></span>
+        <div class="playerHealth">
+          <span id="multiPlayerId">Player&nbsp;<span id="multiId"></span>:&nbsp;</span>
+          <span>
+            HP
+            <span id="message-playerHp"></span>/<span id="message-playerMaxHp"></span>
+          </span>
         </div>
-        <button id="attack">Attack</button>
-        <button id="heal">Heal</button>
+        <div>
+          <img src="./sword.png" id="attack"/>
+          <img src="./heal.png" id="heal"/>
+        </div>
+        <!-- <button id="attack">Attack</button> -->
+        <!-- <button id="heal">Heal</button> -->
       </div>
     </div>
       <!-- https://github.com/jeromeetienne/AR.js/blob/master/README.md -->
@@ -156,25 +211,32 @@ a-scene {
         <!-- define a simple camera -->
         <a-entity camera></a-entity>
     	</a-scene>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+        var socket = io();
+      </script>
   </body>
   <script>
+
     var queueCounter = 0;
     var soloFight = document.getElementById('soloFight');
     var multiFight = document.getElementById('multiFight');
+    var startMulti = document.getElementById('startMulti');
+    var multiTitle = document.getElementById('multiTitle');
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
     // waiting for marker to be found after page is loaded
-    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
-    var hideBattle = setInterval(() => {
-      if (document.getElementById('a-marker').object3D.visible) {
-        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
-        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
-        document.getElementById('enemyTitle').classList.remove('isHidden');
-        markerFound = true;
-        clearInterval(hideBattle);
-      }
-    }, 500);
+    // var hideBattle = setInterval(() => {
+    //   if (document.getElementById('a-marker').object3D.visible) {
+    //     // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+    //     // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
+    //     document.getElementById('enemyTitle').classList.remove('isHidden');
+    //     markerFound = true;
+    //     clearInterval(hideBattle);
+    //   }
+    // }, 500);
 
     // init game state
     let cactaur = {
@@ -215,6 +277,72 @@ a-scene {
       win: false,
       lose: false,
       gameover: false,
+    }
+
+    startMulti.addEventListener('click', () => {
+      socket.emit('startBattle');
+      document.getElementById('multiTitle').classList.add('isHidden');
+      document.getElementById('battleOverlay').classList.remove('isHidden');
+
+      socket.on('tick', (json) => {
+        console.log('tick', json)
+        let newState = JSON.parse(json);
+        gameState = newState;
+        if (gameState.started) {
+          document.getElementById('multiId').innerText = playerId;
+          document.getElementById('message-bossName').innerText = gameState.boss.name;
+          document.getElementById('message-playerMaxHp').innerText = gameState.playerMap[playerId].maxHp;
+          document.getElementById('message-bossMaxHp').innerText = gameState.boss.maxHp;
+          if (newState.gameover) {
+            console.log('GAMEOVER', gameState)
+            if (gameState.win) {
+              gameState.currentMessage = 'You beat Cactaur!'
+              socket.disconnect();
+            } else if (gameState.lose) {
+              gameState.currentMessage = 'Cactaur is victorious!'
+              socket.disconnect();
+            }
+            updateDisplay(gameState);
+          }
+          updateDisplay(newState);
+        }
+      })
+    })
+
+    multiFight.addEventListener('click', () => {
+      document.getElementById('enemyTitle').classList.add('isHidden');
+      document.getElementById('multiTitle').classList.remove('isHidden');
+      console.log('starting multi')
+      player.number = playerId
+      player.id = playerId
+      let json = JSON.stringify(player)
+      socket.emit('requestSlot', json);
+    })
+
+    let updateDisplay = (gameState) => {
+      let currentMsg = document.getElementById('message-current')
+      let bossHp = document.getElementById('message-bossHp')
+      let playerHp = document.getElementById('message-playerHp')
+      let nextPlayer = document.getElementById('multiPlayerId');
+      let bossMsg = document.getElementById('message-boss');
+      // update player hp
+      playerHp.innerText = gameState.playerMap[playerId].hp;
+      // update boss hp
+      bossHp.innerText = gameState.boss.hp;
+      // update current message
+      currentMsg.innerText = gameState.currentMessage;
+      bossMsg.innerText = gameState.bossMsg;
+      setTimeout(() => {
+        currentMsg.innerText = '';
+        bossMsg.innerText = '';
+      }, 3000)
+
+      if (gameState.nextPlayer == playerId) {
+        nextPlayer.classList.add('isNext');
+      } else {
+        nextPlayer.classList.remove('isNext');
+      }
+      console.log('UPDATE', gameState.currentMessage)
     }
 
     soloFight.addEventListener('click', () => {
@@ -352,42 +480,46 @@ a-scene {
 
       }, 1000)
     })
+    // player actions
     let attackButton = document.getElementById('attack');
     let healButton = document.getElementById('heal');
     attackButton.addEventListener('click', () => {
-      if (gameState.id === 'solo') {
-        console.log('offline attack')
-        let playerNumber = gameState.playerMap[playerId].number;
-        let action = { owner: playerId, dmg: 0, msg: 'Player ' + playerNumber + ' missed!' }
-        let isHit = Math.random();
-        let isCritical = Math.random();
-        if (isHit > .33) {
-          action.dmg = player.attack
-          action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP!'
-          if (isCritical > .8) {
-            action.dmg = player.critical
-            action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP! Critical!'
-          }
+
+      console.log('offline attack')
+      let playerNumber = gameState.playerMap[playerId].number;
+      let action = { owner: playerId, dmg: 0, msg: 'Player ' + playerNumber + ' missed!' }
+      let isHit = Math.random();
+      let isCritical = Math.random();
+      if (isHit > .33) {
+        action.dmg = player.attack
+        action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP!'
+        if (isCritical > .8) {
+          action.dmg = player.critical
+          action.msg = 'Player ' + playerNumber + ' hit Cactaur for ' + action.dmg + 'HP! Critical!'
         }
-        let nextAction = gameState.playerActions[gameState.actionCounter]
-        if (gameState.playerActions.length === 0) {
-          gameState.playerActions.push(action);
-        } else if (gameState.id === 'solo') {
-          // single player
-          gameState.playerActions.push(action);
-        } else if (gameState.playerActions[gameState.actionCounter].owner !== playerId) {
-          // multiplayer
-          gameState.playerActions.push(action);
-        }
-        console.log(gameState.actionCounter, gameState.playerActions)
       }
+      let nextAction = gameState.playerActions[gameState.actionCounter]
+      if (gameState.playerActions.length === 0) {
+        gameState.playerActions.push(action);
+      } else if (gameState.id === 'solo') {
+        // single player
+        gameState.playerActions.push(action);
+      }
+      console.log(gameState.actionCounter, gameState.playerActions)
+      if (gameState.id === 'multi') {
+        let json = JSON.stringify(action);
+        socket.emit('playerAction', json);
+      }
+
     })
     healButton.addEventListener('click', () => {
-      if (gameState.id === 'solo') {
-        console.log('offline heal')
-        let playerNumber = gameState.playerMap[playerId].number;
-        let action = { owner: playerId, heal: player.heal, msg: 'Player ' + playerNumber + ' healed for ' + player.heal + 'HP!' }
-        gameState.playerActions.push(action);
+      console.log('offline heal')
+      let playerNumber = gameState.playerMap[playerId].number;
+      let action = { owner: playerId, heal: player.heal, msg: 'Player ' + playerNumber + ' healed for ' + player.heal + 'HP!' }
+      gameState.playerActions.push(action);
+      if (gameState.id === 'multi') {
+        let json = JSON.stringify(action);
+        socket.emit('playerAction', json);
       }
     })
   </script>
