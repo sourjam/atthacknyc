@@ -150,8 +150,8 @@ a-scene {
 
   <body style='margin : 0px; overflow: hidden;'>
     <!-- DEBUG -->
-    <!-- <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script> -->
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
     <!-- pre fight title screen -->
      <div id="enemyTitle" class="isHidden">
        <div class="enemyStats">
@@ -241,17 +241,17 @@ a-scene {
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
     // waiting for marker to be found after page is loaded
-    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
-    // var hideBattle = setInterval(() => {
-    //   if (document.getElementById('a-marker').object3D.visible) {
-    //     // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
-    //     // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
-    //     document.getElementById('enemyTitle').classList.remove('isHidden');
-    //     markerFound = true;
-    //     clearInterval(hideBattle);
-    //   }
-    // }, 500);
+    var hideBattle = setInterval(() => {
+      if (document.getElementById('a-marker').object3D.visible) {
+        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
+        document.getElementById('enemyTitle').classList.remove('isHidden');
+        markerFound = true;
+        clearInterval(hideBattle);
+      }
+    }, 500);
 
     // init game state
     let cactaur = {
