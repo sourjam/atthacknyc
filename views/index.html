@@ -130,7 +130,7 @@ a-scene {
       <!-- https://github.com/jeromeetienne/AR.js/blob/master/README.md -->
       <!-- Markercode from here -->
       <!-- https://aframe.io/blog/arjs/#move-the-camera-or-the-marker -->
-    	<a-scene embedded arjs='sourceType: webcam;'>
+    	<a-scene style="position: absolute;" embedded arjs='sourceType: webcam;'>
         <a-marker id="a-marker" preset='hiro'>
           <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
         </a-marker>
