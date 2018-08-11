@@ -476,6 +476,7 @@ a-scene {
       let playerTurns = document.getElementById('playerTurns');
       let playerTurn = document.getElementById('message-playerTurn');
       let playerNext = document.getElementById('message-playerNext');
+      let playerDmg = document.getElementById('message-playerDmg');
       playerTurns.classList.remove('isHidden');
 
       var nextTurnKey = gameState.queue[gameState.queueCounter];
@@ -515,7 +516,16 @@ a-scene {
           currentMsg.innerText = '';
         }, 3000)
       }
-
+      if (!playerTextAnimating && gameState.playerDmg.length > 0) {
+        playerDmg.innerText = gameState.playerDmg;
+        playerDmg.classList.add('slideUp');
+        playerTextAnimating = true;
+        setTimeout(() => {
+          playerDmg.innerText = '';
+          playerDmg.classList.remove('slideUp');
+          playerTextAnimating = false;
+        }, 3000)
+      }
       if (gameState.nextPlayer == playerId) {
         nextPlayer.classList.add('isNext');
       } else {
