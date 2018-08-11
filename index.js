@@ -3,6 +3,8 @@ const express = require('express')
 const path = require('path')
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+// https://github.com/heroku/node-js-getting-started
+// https://socket.io/get-started/chat
 
 app.use(express.static('public'))
 

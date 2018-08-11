@@ -122,7 +122,7 @@ html,body {
       <button id="attack">Attack</button>
       <button id="heal">Heal</button>
     </div>
-    <div id="a-sceneContainer">
+      <!-- https://github.com/jeromeetienne/AR.js/blob/master/README.md -->
       <!-- Markercode from here -->
       <!-- https://aframe.io/blog/arjs/#move-the-camera-or-the-marker -->
     	<a-scene embedded arjs='sourceType: webcam;'>
@@ -132,7 +132,6 @@ html,body {
         <!-- define a simple camera -->
         <a-entity camera></a-entity>
     	</a-scene>
-    </div>
   </body>
   <script>
     var queueCounter = 0;
@@ -145,6 +144,8 @@ html,body {
     // uncomment below for release
     var hideBattle = setInterval(() => {
       if (document.getElementById('a-marker').object3D.visible) {
+        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
         document.getElementById('enemyTitle').classList.remove('isHidden');
         markerFound = true;
         clearInterval(hideBattle);
