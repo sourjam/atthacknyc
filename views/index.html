@@ -20,23 +20,30 @@ a-scene {
 	left: 0;
 }
 #a-scene.gotHit {
-	animation: .25s bosshit ease-in-out;
+	animation: .66s bosshit ease-in-out;
 }
 @keyframes bosshit {
 	0% {
 		transform: translateY(-5%)
 	}
-	25% {
+	10% {
 		transform: translateY(5%)
 	}
-	50% {
+	20% {
 		transform: translateY(-5%)
 	}
-	75% {
+	30% {
 		transform: translateY(5%)
 	}
-	100% {
+	40% {
 		transform: translateY(0)
+	}
+	50% {
+		transform: rotate3d(0, 1, 0, 180deg);
+		transform-origin: center;
+	}
+	100% {
+		transform: rotate3d(0, 1, 0, 360deg);
 	}
 }
 #ffLogo {
