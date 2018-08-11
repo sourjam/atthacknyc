@@ -54,6 +54,28 @@ a-scene {
 	left: 1em;
 	width: 8em;
 }
+.playerTurns {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	right: 0;
+	top: 0;
+	font-family: sans-serif;
+	font-size: .7em;
+	font-weight: 100;
+	width: 5em;
+}
+.turnNext {
+	color: white;
+	padding: .25em;
+	height: 1em;
+	background-color: rgba(0,0,0,0.7);
+}
+#message-playerTurn, #message-playerNext {
+	height: 1em;
+	color: white;
+	padding: .25em;
+}
 #enemyTitle, #multiTitle {
   font-size: 1em;
 	line-height: 1.5em;
@@ -261,6 +283,12 @@ a-scene {
     </div>
     <div id="battleOverlay" class="isHidden">
       <img id="ffLogo" src="./logo.png"/>
+      <div id="playerTurns" class="playerTurns isHidden">
+        <div class="turnNext">Turn</div>
+        <div id="message-playerTurn"></div>
+        <div class="turnNext">Next</div>
+        <div id="message-playernext"></div>
+      </div>
       <div id="message-current"></div>
       <div id="message-next"></div>
       <div id="message-boss"></div>
@@ -436,6 +464,26 @@ a-scene {
       let nextPlayer = document.getElementById('multiPlayerId');
       let bossMsg = document.getElementById('message-bossMove');
       let bossDmg = document.getElementById('message-bossDmg');
+      let playerTurns = document.getElementById('playerTurns');
+      let playerTurn = document.getElementById('message-playerTurn');
+      let playerNext = document.getElementById('message-playerNext');
+      playerTurns.classList.remove('isHidden');
+
+      var nextTurnKey = gameState.queue[gameState.queueCounter];
+      if (nextTurnKey === 'boss') {
+        playerTurn.innerText = 'Boss'
+      } else {
+        playerTurn.innerText = 'Player ' + nextTurnKey;
+      }
+      let nextIndex = gameState.queueCounter += 1;
+      var nextNextTurnKey = gameState.queue[nextIndex];
+      if (!nextNextTurnKey) {
+        playerNext.innerText = 'Boss'
+      } else {
+        playerNext.innerText = 'Player ' + nextNextTurnKey;
+      }
+
+
       // update player hp
       playerHp.innerText = gameState.playerMap[playerId].hp;
       // update boss hp
@@ -588,12 +636,14 @@ a-scene {
       document.getElementById('message-playerMaxHp').innerText = gameState.playerMap[playerId].maxHp;
       document.getElementById('message-bossMaxHp').innerText = gameState.boss.maxHp;
       let updateDisplay = (gameState) => {
+        // solo
         let currentMsg = document.getElementById('message-current')
         let bossHp = document.getElementById('message-bossHp')
         let bossMsg = document.getElementById('message-bossMove')
         let bossDmg = document.getElementById('message-bossDmg')
         let playerHp = document.getElementById('message-playerHp')
         let playerDmg = document.getElementById('message-playerDmg');
+
         // update player hp
         playerHp.innerText = gameState.playerMap[playerId].hp;
         // update boss hp
