@@ -42,6 +42,7 @@ let gameStateTemplate = {
   bossMsg: '',
   bossDmg: '',
   bossHit: false,
+  playerDmg: '',
 }
 let gameState = Object.assign({}, gameStateTemplate);
 
@@ -82,6 +83,7 @@ let playerTurn = (gameState, playerKey) => {
   if (action.dmg) {
     gameState.boss.hp -= action.dmg;
     gameState.bossHit = true;
+    gameState.playerDmg = '-' + action.dmg + ' HP';
   } else if (action.heal) {
     gameState.playerMap[playerKey].hp += action.heal;
     if (gameState.playerMap[playerKey].hp > gameState.playerMap[playerKey].maxHp) {
@@ -102,6 +104,7 @@ let gameLoop = (gameState) => {
   gameState.bossHit = false;
   gameState.bossDmg = '';
   gameState.bossMsg = '';
+  gameState.playerDmg = '';
   // check for gameovers
   if (gameState.lose || gameState.playerDeaths === gameState.queue.length - 1) {
     gameState.gameover = true;
