@@ -21,12 +21,6 @@ html,body {
 </head>
 <body>
 
-<h1>Pattern marker example with Three.js</h1>
-<p>On Chrome on Android, tap the screen to start playing video stream.</p>
-<p>Show  Hiro pattern and to camera to display a colorful objects on top of them. Tap the screen to rotate the objects.
-
-<p>&larr; <a href="index.html">Back to examples</a></p>
-
 <!-- <script async src="../build/artoolkit.min.js"></script>
 <script async src="js/third_party/three.js/three.min.js"></script>
 <script async src="../js/artoolkit.three.js"></script> -->
@@ -123,36 +117,3 @@ if (window.ARController && ARController.getUserMediaThreeScene) {
 
 </body>
 </html>
-
-<html>
-<head>
-<title>Pattern marker example with Three.js</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-<style>
-html,body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	text-align: center;
-	overflow-x: hidden;
-}
-.portrait canvas {
-	transform-origin: 0 0;
-	transform: rotate(-90deg) translateX(-100%);
-}
-.desktop canvas {
- 	transform: scale(-1, 1);
-}
-</style>
-</head>
-<body>
-
-<button id="soloStart">solo battle</button>
-<button id="multiStart">multi battle</button>
-
-<h1>Pattern marker example with Three.js</h1>
-<p>On Chrome on Android, tap the screen to start playing video stream.</p>
-<p>Show  <a href="https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf">Hiro pattern</a> and <a href="https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Kanji%20pattern.pdf">Kanji pattern</a> to camera to display a colorful objects on top of them. Tap the screen to rotate the objects.
-
-<p>&larr; <a href="index.html">Back to examples</a></p>
