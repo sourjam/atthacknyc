@@ -350,17 +350,17 @@ a-scene {
     var bossTextAnimating = false;
     var playerTextAnimating = false;
     // waiting for marker to be found after page is loaded
-    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
-    // var hideBattle = setInterval(() => {
-    //   if (document.getElementById('a-marker').object3D.visible) {
-    //     // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
-    //     // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
-    //     document.getElementById('enemyTitle').classList.remove('isHidden');
-    //     markerFound = true;
-    //     clearInterval(hideBattle);
-    //   }
-    // }, 500);
+    var hideBattle = setInterval(() => {
+      if (document.getElementById('a-marker').object3D.visible) {
+        // https://github.com/artoolkit/artoolkit5/blob/master/doc/patterns/Hiro%20pattern.pdf
+        // https://stackoverflow.com/questions/44799413/how-to-detect-when-marker-is-found-in-ar-js
+        document.getElementById('enemyTitle').classList.remove('isHidden');
+        markerFound = true;
+        clearInterval(hideBattle);
+      }
+    }, 500);
 
     // init game state
     let cactaur = {
