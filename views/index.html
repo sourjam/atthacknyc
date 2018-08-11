@@ -119,7 +119,8 @@ html,body {
         HP
         <span id="message-playerHp"></span>/<span id="message-playerMaxHp"></span>
       </div>
-      <button id="attack"></button>
+      <button id="attack">Attack</button>
+      <button id="heal">Heal</button>
     </div>
     <div id="a-sceneContainer">
       <!-- Markercode from here -->
@@ -140,7 +141,7 @@ html,body {
     var markerFound = false;
     var playerId = Math.random().toFixed(3).toString().replace('0.', '');
     // waiting for marker to be found after page is loaded
-    document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
+    // document.getElementById('enemyTitle').classList.remove('isHidden'); //debug
     // uncomment below for release
     var hideBattle = setInterval(() => {
       if (document.getElementById('a-marker').object3D.visible) {
@@ -159,7 +160,7 @@ html,body {
       let cactaur = {
         name: 'Cactaur',
         attack: '100',
-        actions: ['100 needles', 'escape', '10 needles', 'thinking about an escape!'], // add an easy attack to help win?
+        actions: ['100 needles', '10 needles', 'thinking about an escape!'], // add an easy attack to help win?
         dead: false,
         hp: 1000,
         maxHp: 1000,
@@ -198,7 +199,10 @@ html,body {
         let playerHp = document.getElementById('message-playerHp')
         // update player hp
         playerHp.innerText = gameState.playerMap[playerId].hp;
-
+        // update boss hp
+        bossHp.innerText = gameState.boss.hp;
+        // update current message
+        currentMsg.innerText = gameState.currentMessage;
       }
       updateDisplay(gameState);
       // gameloop
