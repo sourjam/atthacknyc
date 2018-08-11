@@ -40,6 +40,7 @@ let gameStateTemplate = {
   started: false,
   nextPlayer: '',
   bossMsg: '',
+  bossHit: false,
 }
 let gameState = Object.assign({}, gameStateTemplate);
 
@@ -78,6 +79,7 @@ let playerTurn = (gameState, playerKey) => {
   let action = gameState.playerActions[gameState.actionCounter];
   if (action.dmg) {
     gameState.boss.hp -= action.dmg;
+    gameState.bossHit = true;
   } else if (action.heal) {
     gameState.playerMap[playerKey].hp += action.heal;
     if (gameState.playerMap[playerKey].hp > gameState.playerMap[playerKey].maxHp) {
@@ -95,6 +97,7 @@ let playerTurn = (gameState, playerKey) => {
   return gameState;
 }
 let gameLoop = (gameState) => {
+  gameState.bossHit = false;
   // check for gameovers
   if (gameState.lose || gameState.playerDeaths === gameState.queue.length - 1) {
     gameState.gameover = true;
@@ -147,6 +150,8 @@ io.on('connection', (socket) => {
 
   socket.on('startBattle', () => {
     gameState.started = true;
+    let json = JSON.stringify(gameState)
+    io.emit('startBattle', json);
   })
 
   socket.on('requestSlot', (json) => {

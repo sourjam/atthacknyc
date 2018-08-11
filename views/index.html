@@ -20,14 +20,20 @@ a-scene {
 	left: 0;
 }
 #a-scene.gotHit {
-	animation: .5s bosshit ease-in-out;
+	animation: .25s bosshit ease-in-out;
 }
 @keyframes bosshit {
 	0% {
-		transform: translateY(-15%)
+		transform: translateY(-5%)
+	}
+	25% {
+		transform: translateY(5%)
 	}
 	50% {
-		transform: translateY(15%)
+		transform: translateY(-5%)
+	}
+	75% {
+		transform: translateY(5%)
 	}
 	100% {
 		transform: translateY(0)
@@ -56,6 +62,7 @@ a-scene {
 #multiTitle {
   position: absolute;
   top: 0;
+	left: 0;
 }
 #battleOverlay {
 	position: absolute;
@@ -233,7 +240,7 @@ a-scene {
       <!-- https://github.com/jeromeetienne/AR.js/blob/master/README.md -->
       <!-- Markercode from here -->
       <!-- https://aframe.io/blog/arjs/#move-the-camera-or-the-marker -->
-    	<a-scene style="position: absolute;" embedded arjs='sourceType: webcam;'>
+    	<a-scene id="a-scene" style="position: absolute;" embedded arjs='sourceType: webcam; debugUIEnabled: false;' vr-mode-ui="enabled: false">
         <a-marker id="a-marker" preset='hiro'>
           <a-plane src="cactaur.png" position='0 0.5 0' material='opacity: 1;' rotation='-90 0 0' width="2" height="2"></a-plane>
         </a-marker>
@@ -309,8 +316,7 @@ a-scene {
       gameover: false,
     }
 
-    startMulti.addEventListener('click', () => {
-      socket.emit('startBattle');
+    let startBattle = () => {
       document.getElementById('multiTitle').classList.add('isHidden');
       document.getElementById('battleOverlay').classList.remove('isHidden');
 
@@ -337,6 +343,16 @@ a-scene {
           updateDisplay(newState);
         }
       })
+    }
+
+    startMulti.addEventListener('click', () => {
+      socket.emit('startBattle');
+    })
+
+    socket.on('startBattle', (json) => {
+      let newState = JSON.parse(json);
+      gameState = newState;
+      startBattle();
     })
 
     multiFight.addEventListener('click', () => {
@@ -361,12 +377,7 @@ a-scene {
       bossHp.innerText = gameState.boss.hp;
       // update current message
       currentMsg.innerText = gameState.currentMessage;
-      if (gameState.innerText.match('hit')) {
-        ascene.classList.add('gotHit');
-        setTimeout(() => {
-          ascene.classList.remove('gotHit')
-        }, 500)
-      }
+
       bossMsg.innerText = gameState.bossMsg;
       setTimeout(() => {
         currentMsg.innerText = '';
@@ -377,6 +388,13 @@ a-scene {
         nextPlayer.classList.add('isNext');
       } else {
         nextPlayer.classList.remove('isNext');
+      }
+
+      if (gameState.bossHit) {
+        ascene.classList.add('gotHit');
+        setTimeout(() => {
+          ascene.classList.remove('gotHit')
+        }, 500)
       }
       console.log('UPDATE', gameState.currentMessage)
     }
@@ -426,6 +444,7 @@ a-scene {
         if (action.dmg) {
           gameState.boss.hp -= action.dmg;
           gameState.currentMessage = action.msg;
+          gameState.bossHit = true;
         } else if (action.heal) {
           gameState.playerMap[playerKey].hp += action.heal;
           if (gameState.playerMap[playerKey].hp > gameState.playerMap[playerKey].maxHp) {
@@ -443,6 +462,7 @@ a-scene {
         return gameState;
       }
       let gameLoop = (gameState) => {
+        gameState.bossHit = false;
         // check for gameovers
         if (gameState.lose || gameState.playerDeaths === gameState.queue.length - 1) {
           gameState.gameover = true;
@@ -496,6 +516,12 @@ a-scene {
         bossHp.innerText = gameState.boss.hp;
         // update current message
         currentMsg.innerText = gameState.currentMessage;
+        if (gameState.bossHit) {
+          ascene.classList.add('gotHit');
+          setTimeout(() => {
+            ascene.classList.remove('gotHit')
+          }, 500)
+        }
         console.log('UPDATE', gameState.currentMessage)
       }
       updateDisplay(gameState);
