@@ -95,14 +95,14 @@ a-scene {
 	/* color: yellow; */
 	position: absolute;
 	left: 2em;
-	bottom: 14%;
+	top: -15%;
 	height: 1em;
 	width: 10em;
 	/* background-color: green; */
 }
 
 #message-bossMove {
-	bottom: 16%;
+	top: -35%;
 }
 
 #message-bossDmg.slideUp, #message-bossMove.slideUp {
@@ -111,7 +111,6 @@ a-scene {
 }
 @keyframes slideup {
 	0% {
-		transform: translateY(14%);
 		opacity: 1;
 	}
 	100% {
@@ -260,9 +259,9 @@ a-scene {
           <span id="message-bossHp"></span>/<span id="message-bossMaxHp"></span>
         </span>
       </div>
-      <div id="message-bossMove"></div>
-      <div id="message-bossDmg"></div>
       <div id="playerData">
+        <div id="message-bossMove"></div>
+        <div id="message-bossDmg"></div>
         <div class="playerHealth">
           <span id="multiPlayerId">Player&nbsp;<span id="multiId"></span>:&nbsp;</span>
           <span>
